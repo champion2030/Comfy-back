@@ -1,12 +1,26 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+  UsePipes,
+} from '@nestjs/common';
 import { DeleteResult } from 'typeorm';
 import { MainPageService } from '../services/mainPage.service';
 import { CreateMainPageDto } from '../dto/create-mainPage.dto';
 import { MainPage } from '../shemes/mainPage.entity';
 import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
+import { ValidationPipe } from '../exceptions/validation.pipe';
 
 @Controller('main')
 export class MainPageController {
+  private logger = new Logger('ProductController')
   constructor(private mainPageService: MainPageService) {}
 
   @Get()
@@ -15,8 +29,11 @@ export class MainPageController {
   }
 
   @Post()
+  @UsePipes(new ValidationPipe())
   create(@Body() createMainPageDto: CreateMainPageDto){
-        return this.mainPageService.create(createMainPageDto)
+    this.logger.log(JSON.stringify(createMainPageDto))
+
+    return this.mainPageService.create(createMainPageDto)
   }
 
   @Get(':id')
@@ -25,7 +42,9 @@ export class MainPageController {
   }
 
   @Put(':id')
+  @UsePipes(new ValidationPipe())
   updateOne(@Param('id') id: number, @Body() updateMainPageDto: Partial<UpdateMainPageDto>) {
+    this.logger.log(JSON.stringify(updateMainPageDto))
     return this.mainPageService.updateOne(id, updateMainPageDto)
   }
 

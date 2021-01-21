@@ -20,17 +20,30 @@ export class MainPageService{
   }
 
   public async findById(id: number){
-    return await this.mainPageRepository.findOne({where:{id}})
+    const product = await this.mainPageRepository.findOne({where:{id}})
+    if (!product){
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
+    }
+    return product
   }
 
   public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>) {
+    let product = await this.mainPageRepository.findOne({where:{id}})
+    if (!product){
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
+    }
     await this.mainPageRepository.update({id}, updateMainPageDto)
-    return this.mainPageRepository.findOne({id})
+    product = await this.mainPageRepository.findOne({where: {id}})
+    return product
   }
 
   public async deleteOne(id: number){
+    const product = await this.mainPageRepository.findOne({where:{id}})
+    if (!product){
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
+    }
     await this.mainPageRepository.delete({id})
-    return {deleted: true}
+    return product
   }
 
 }

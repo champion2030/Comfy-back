@@ -5,18 +5,6 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { DeleteResult } from 'typeorm';
 
-// @Crud({
-//   model:{
-//     type:User
-//   }
-// })
-//
-// @ApiTags('users')
-// @Controller('users')
-// export class UsersController implements CrudController<User>{
-//   constructor(public  service: UsersService) {}
-// }
-
 @Controller('users')
 export class UsersController{
   constructor(private userService: UsersService) { }

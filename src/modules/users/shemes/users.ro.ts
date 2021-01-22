@@ -1,7 +1,9 @@
 export class UserRO {
   id: number
+  created: Date
   firstName: string
   lastName: string
   email: string;
-  isActive: boolean
+  userName: string
+  token?: string
 }

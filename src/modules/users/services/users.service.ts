@@ -4,26 +4,41 @@ import { DeleteResult, Repository } from 'typeorm';
 import { User } from '../shemes/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { LoginUserDto } from '../dto/login-user.dto';
+import { UserRO } from '../shemes/users.ro';
 
 @Injectable()
-/*
-export class UsersService extends TypeOrmCrudService<User>{
-  constructor(
-    @InjectRepository(User) userRepository, private authService: AuthService) {
-    super(userRepository)
-  }
-}*/
-
 export class UsersService{
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  public async findAll(): Promise<User[]>{
-    return this.userRepository.find()
+  async findAll() : Promise<UserRO[]>{
+    const users = await this.userRepository.find()
+    return users.map(user => user.toResponseObject(false))
   }
 
-  public async findByEmail(userEmail: string) : Promise<User | null>{
+  async login(data : LoginUserDto) : Promise<UserRO>{
+    const {userName, password} = data
+    const user = await this.userRepository.findOne({where:{userName}})
+    if(!user || !(await user.comparePassword(password))){
+      throw new HttpException('Invalid userName/password', HttpStatus.BAD_REQUEST)
+    }
+    return user.toResponseObject()
+  }
+
+  public async register(createUserDto: CreateUserDto) : Promise<UserRO> {
+    const { userName } = createUserDto;
+    let user = await this.userRepository.findOne({ where: { userName } });
+    if (user) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST,);
+    }
+    user = await this.userRepository.create(createUserDto);
+    await this.userRepository.save(user);
+    return user.toResponseObject()
+  }
+
+  /*public async findByEmail(userEmail: string) : Promise<User | null>{
     return await this.userRepository.findOne({email:userEmail})
   }
 
@@ -46,18 +61,6 @@ export class UsersService{
     }
     await this.userRepository.update(id, updateUserDto)
     return this.userRepository.findOne(id)
-  }
+  }*/
 
-  public async register(createUserDto: CreateUserDto): Promise<User> {
-    const { email } = createUserDto;
-    let user = await this.userRepository.findOne({ where: { email } });
-    if (user) {
-      throw new HttpException(
-        'User already exists',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    user = await this.userRepository.create(createUserDto);
-    return await this.userRepository.save(user);
-  }
 }

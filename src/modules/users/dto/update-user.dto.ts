@@ -1,17 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ApiModelProperty } from '@nestjs/swagger/dist/decorators/api-model-property.decorator';
+import { IsNotEmpty } from 'class-validator';
 
 export class UpdateUserDto{
-  @ApiModelProperty()
-  readonly id: number;
-  @ApiProperty()
+  @IsNotEmpty()
   readonly firstName: string
-  @ApiProperty()
+  @IsNotEmpty()
   readonly lastName: string
-  @ApiProperty()
+  @IsNotEmpty()
   readonly email: string
-  @ApiProperty()
+  @IsNotEmpty()
+  readonly userName: string
+  @IsNotEmpty()
   readonly password: string
-  @ApiProperty()
-  readonly isActive?: boolean
 }

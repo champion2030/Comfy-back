@@ -1,53 +1,63 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
-import { UserRO } from './users.ro';
+import * as jwt from 'jsonwebtoken'
 
 @Entity()
 export class User {
 
-  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
-  @Column()
+  @CreateDateColumn()
+  created: Date
+
+  @Column('text')
   firstName: string;
 
-  @ApiProperty()
-  @Column()
+  @Column('text')
   lastName: string;
 
-  @ApiProperty()
   @Column({unique:true})
   email: string;
 
-  @ApiProperty()
-  @Column()
-  password: string;
+  @Column({type : 'text', unique : true})
+  userName: string;
 
-  @ApiProperty()
-  @Column({ default: true })
-  isActive: boolean;
+  @Column('text')
+  password: string;
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 12);
+    this.password = await bcrypt.hash(this.password, 10);
   }
 
-  async comparePassword(attempt: string): Promise<boolean> {
+  async comparePassword(attempt: string) {
     return await bcrypt.compare(attempt, this.password);
   }
 
-  toResponseObject(showToken: boolean = true): UserRO {
-    const { id, firstName, lastName, email, isActive } = this;
-    return {
-      id,
-      firstName,
-      lastName,
-      email,
-      isActive
-    };
+  toResponseObject(showToken: boolean = true) {
+    const { id, created, firstName, lastName, email, userName, token } = this;
+    const responseObject : any = { id, created, firstName, lastName, email, userName };
+    if (showToken){
+      responseObject.token = token
+    }
+    return responseObject
+  }
+
+  private get token(){
+    const {id, firstName, lastName, email, userName} = this
+    return jwt.sign(
+      {
+        id,
+        firstName,
+        lastName,
+        email,
+        userName
+      },
+      process.env.SECRET,
+      {expiresIn: '7d'},
+    );
   }
 
 }

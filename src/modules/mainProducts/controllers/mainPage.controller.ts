@@ -18,7 +18,7 @@ import { MainPage } from '../shemes/mainPage.entity';
 import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
 import { ValidationPipe } from '../exceptions/validation.pipe';
 
-@Controller('main')
+@Controller('comfy/main')
 export class MainPageController {
   private logger = new Logger('ProductController')
   constructor(private mainPageService: MainPageService) {}

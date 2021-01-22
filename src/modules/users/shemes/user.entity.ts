@@ -1,5 +1,4 @@
 import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken'
 

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../shemes/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -38,29 +38,39 @@ export class UsersService{
     return user.toResponseObject()
   }
 
-  /*public async findByEmail(userEmail: string) : Promise<User | null>{
-    return await this.userRepository.findOne({email:userEmail})
-  }
-
-  public async findById(id: number): Promise<User | null>{
-    return await this.userRepository.findOneOrFail(id)
-  }
-
-  public async create(createUserDto: CreateUserDto): Promise<User>{
-    return await this.userRepository.save(createUserDto)
-  }
-
-  public async deleteOne(id: number): Promise<DeleteResult>{
-    return await this.userRepository.delete(id)
-  }
-
-  public async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
-    const user = await this.userRepository.findOneOrFail(id)
-    if (!user.id){
-      throw new NotFoundException("Don't have such user")
+  public async findById(id: number) {
+    const user = await this.userRepository.findOne({where:{id}})
+    if (!user){
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
     }
-    await this.userRepository.update(id, updateUserDto)
-    return this.userRepository.findOne(id)
-  }*/
+    return user
+  }
+
+  public async findByEmail(userEmail: string) {
+    const user = await this.userRepository.findOne({where:{userEmail}})
+    if (!user){
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
+    }
+    return user
+  }
+
+  public async deleteOne(id: number) {
+    const user = await this.userRepository.findOne({where:{id}})
+    if (!user){
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
+    }
+    await this.userRepository.delete({id})
+    return user
+  }
+
+  public async updateOne(id: number, updateUserDto: Partial<UpdateUserDto>){
+    let user = await this.userRepository.findOne({where:{id}})
+    if (!user.id){
+      throw new HttpException("Not found", HttpStatus.NOT_FOUND)
+    }
+    await this.userRepository.update({id}, updateUserDto)
+    user = await this.userRepository.findOne({where:{id}})
+    return user
+  }
 
 }

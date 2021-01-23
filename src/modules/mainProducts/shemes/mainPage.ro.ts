@@ -4,4 +4,6 @@ export class mainPageRO {
   bought: boolean
   title: string
   price: number
+  upVotes?: number
+  downVotes?: number
 }

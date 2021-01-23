@@ -1,6 +1,7 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken'
+import { MainPage } from '../../mainProducts/shemes/mainPage.entity';
 
 @Entity()
 export class User {
@@ -26,6 +27,10 @@ export class User {
   @Column('text')
   password: string;
 
+  @ManyToMany(type => MainPage, {cascade: true})
+  @JoinTable()
+  bookmarks: MainPage[]
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
@@ -40,6 +45,9 @@ export class User {
     const responseObject : any = { id, created, firstName, lastName, email, userName };
     if (showToken){
       responseObject.token = token
+    }
+    if (this.bookmarks){
+      responseObject.bookmarks = this.bookmarks
     }
     return responseObject
   }

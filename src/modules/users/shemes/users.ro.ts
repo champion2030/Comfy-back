@@ -1,3 +1,5 @@
+import { User } from './user.entity';
+
 export class UserRO {
   id: number
   created: Date
@@ -6,4 +8,5 @@ export class UserRO {
   email: string;
   userName: string
   token?: string
+  bookmarks?: User[]
 }

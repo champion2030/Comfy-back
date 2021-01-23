@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../users/shemes/user.entity';
 
 @Entity()
 export class MainPage {
@@ -22,4 +23,12 @@ export class MainPage {
   @ApiProperty()
   @Column()
   price: number;
+
+  @ManyToMany(type => User, {cascade: true})
+  @JoinTable()
+  upVotes: User[]
+
+  @ManyToMany(type => User, {cascade:true})
+  @JoinTable()
+  downVotes: User[]
 }

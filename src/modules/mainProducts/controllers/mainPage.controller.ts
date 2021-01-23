@@ -8,7 +8,7 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query, UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { DeleteResult } from 'typeorm';
@@ -17,6 +17,8 @@ import { CreateMainPageDto } from '../dto/create-mainPage.dto';
 import { MainPage } from '../shemes/mainPage.entity';
 import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
 import { ValidationPipe } from '../exceptions/validation.pipe';
+import { AuthGuard } from '../../auth/auth.guard';
+import { User } from '../../users/decorator/user.decorator';
 
 @Controller('comfy/main')
 export class MainPageController {
@@ -37,7 +39,7 @@ export class MainPageController {
   }
 
   @Get(':id')
-  findOneById(@Param('id') id: number) {
+  async findOneById(@Param('id') id: number) {
     return this.mainPageService.findById(id)
   }
 
@@ -51,6 +53,30 @@ export class MainPageController {
   @Delete(':id')
   deleteOne(@Param('id') id: number) {
     return this.mainPageService.deleteOne(id)
+  }
+
+  @Post(':id/bookmark')
+  @UseGuards(new AuthGuard())
+  bookmarkProduct(@Param('id') id: number, @User('id') user : number){
+    return this.mainPageService.bookmark(id, user)
+  }
+
+  @Delete(':id/bookmark')
+  @UseGuards(new AuthGuard())
+  unBookmarkProduct(@Param('id') id: number, @User('id') user : number){
+    return this.mainPageService.unBookmark(id, user)
+  }
+
+  @Post(':id/upvote')
+  @UseGuards(new AuthGuard())
+  upvoteProduct(@Param('id') id: number, @User('id') user: number) {
+    return this.mainPageService.upvote(id, user)
+  }
+
+  @Post(':id/downVote')
+  @UseGuards(new AuthGuard())
+  downVoteProduct(@Param('id') id: number, @User('id') user: number){
+    return this.mainPageService.downVote(id, user)
   }
 
 }

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../shemes/user.entity';
+import { UserEntity } from '../shemes/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
@@ -10,15 +10,15 @@ import { UserRO } from '../shemes/users.ro';
 @Injectable()
 export class UsersService{
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
   ) {}
 
-  async findAll() : Promise<UserRO[]>{
-    const users = await this.userRepository.find({relations:['bookmarks']})
+  async findAll():Promise<UserRO[]> {
+    const users = await this.userRepository.find()
     return users.map(user => user.toResponseObject(false))
   }
 
-  async login(data : LoginUserDto) : Promise<UserRO>{
+  async login(data : LoginUserDto): Promise<UserRO> {
     const {userName, password} = data
     const user = await this.userRepository.findOne({where:{userName}})
     if(!user || !(await user.comparePassword(password))){
@@ -46,8 +46,8 @@ export class UsersService{
     return user
   }
 
-  public async findByEmail(userEmail: string) {
-    const user = await this.userRepository.findOne({where:{userEmail}})
+  public async findByEmail(email: string) {
+    const user = await this.userRepository.findOne({where:{email}})
     if (!user){
       throw new HttpException('Not found', HttpStatus.NOT_FOUND)
     }

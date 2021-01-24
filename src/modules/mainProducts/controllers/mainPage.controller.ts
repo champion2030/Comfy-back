@@ -4,17 +4,14 @@ import {
   Delete,
   Get,
   Logger,
-  NotFoundException,
   Param,
   Post,
   Put,
-  Query, UseGuards,
+  UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { DeleteResult } from 'typeorm';
 import { MainPageService } from '../services/mainPage.service';
 import { CreateMainPageDto } from '../dto/create-mainPage.dto';
-import { MainPage } from '../shemes/mainPage.entity';
 import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
 import { ValidationPipe } from '../exceptions/validation.pipe';
 import { AuthGuard } from '../../auth/auth.guard';
@@ -22,7 +19,6 @@ import { User } from '../../users/decorator/user.decorator';
 
 @Controller('comfy/main')
 export class MainPageController {
-  private logger = new Logger('ProductController')
   constructor(private mainPageService: MainPageService) {}
 
   @Get()
@@ -31,10 +27,9 @@ export class MainPageController {
   }
 
   @Post()
+  //@UseGuards(new AuthGuard())
   @UsePipes(new ValidationPipe())
   create(@Body() createMainPageDto: CreateMainPageDto){
-    this.logger.log(JSON.stringify(createMainPageDto))
-
     return this.mainPageService.create(createMainPageDto)
   }
 
@@ -44,18 +39,19 @@ export class MainPageController {
   }
 
   @Put(':id')
+  //@UsePipes(new ValidationPipe())
   @UsePipes(new ValidationPipe())
   updateOne(@Param('id') id: number, @Body() updateMainPageDto: Partial<UpdateMainPageDto>) {
-    this.logger.log(JSON.stringify(updateMainPageDto))
     return this.mainPageService.updateOne(id, updateMainPageDto)
   }
 
   @Delete(':id')
+  //@UseGuards(new AuthGuard())
   deleteOne(@Param('id') id: number) {
     return this.mainPageService.deleteOne(id)
   }
 
-  @Post(':id/bookmark')
+  /*@Post(':id/bookmark')
   @UseGuards(new AuthGuard())
   bookmarkProduct(@Param('id') id: number, @User('id') user : number){
     return this.mainPageService.bookmark(id, user)
@@ -77,6 +73,6 @@ export class MainPageController {
   @UseGuards(new AuthGuard())
   downVoteProduct(@Param('id') id: number, @User('id') user: number){
     return this.mainPageService.downVote(id, user)
-  }
+  }*/
 
 }

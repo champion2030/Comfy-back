@@ -1,10 +1,20 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken'
-import { MainPage } from '../../mainProducts/shemes/mainPage.entity';
+import { MainPageEntity } from '../../mainProducts/shemes/mainPage.entity';
+import { UserRO } from './users.ro';
 
-@Entity()
-export class User {
+@Entity('user')
+export class UserEntity {
 
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,9 +37,12 @@ export class User {
   @Column('text')
   password: string;
 
+  /*@OneToMany(type => MainPage, product => product.author)
+  products: MainPage[]
+
   @ManyToMany(type => MainPage, {cascade: true})
   @JoinTable()
-  bookmarks: MainPage[]
+  bookmarks: MainPage[]*/
 
   @BeforeInsert()
   async hashPassword() {
@@ -40,14 +53,11 @@ export class User {
     return await bcrypt.compare(attempt, this.password);
   }
 
-  toResponseObject(showToken: boolean = true) {
+  toResponseObject(showToken: boolean = true): UserRO {
     const { id, created, firstName, lastName, email, userName, token } = this;
     const responseObject : any = { id, created, firstName, lastName, email, userName };
     if (showToken){
       responseObject.token = token
-    }
-    if (this.bookmarks){
-      responseObject.bookmarks = this.bookmarks
     }
     return responseObject
   }

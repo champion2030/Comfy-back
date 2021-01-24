@@ -1,60 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MainPage } from '../shemes/mainPage.entity';
+import { MainPageEntity } from '../shemes/mainPage.entity';
 import { CreateMainPageDto } from '../dto/create-mainPage.dto';
 import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
 import { mainPageRO } from '../shemes/mainPage.ro';
-import { User } from '../../users/shemes/user.entity';
-import { Votes } from '../../auth/votes.enum';
+import { UserEntity } from '../../users/shemes/user.entity';
 
 @Injectable()
 export class MainPageService {
   constructor(
-    @InjectRepository(MainPage) private mainPageRepository: Repository<MainPage>,
-    @InjectRepository(User) private userRepository: Repository<User>,
-  ) {
-  }
+    @InjectRepository(MainPageEntity) private mainPageRepository: Repository<MainPageEntity>,
+  ) {}
 
-  public async findAll() {
-    const products = await this.mainPageRepository.find({
-      relations: ['upVotes', 'downVotes'],
-    });
-    return products.map(product => this.toResponseObject(product));
-  }
-
-  public async create(createMainPageDto: CreateMainPageDto) {
-    return await this.mainPageRepository.save(createMainPageDto);
-  }
-
-  public async findById(id: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id }, relations:['upVotes, downVotes'] });
-    if (!product) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-    }
-    return product;
-  }
-
-  public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>) {
-    let product = await this.mainPageRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-    }
-    await this.mainPageRepository.update({ id }, updateMainPageDto);
-    product = await this.mainPageRepository.findOne({ where: { id } });
-    return product;
-  }
-
-  public async deleteOne(id: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-    }
-    await this.mainPageRepository.delete({ id });
-    return product;
-  }
-
-  private toResponseObject(product: MainPage): mainPageRO {
+  /*private toResponseObject(product: MainPageEntity): mainPageRO {
     const responseObject: any = { ...product };
     if (responseObject.upVotes) {
       responseObject.upVotes = product.upVotes.length;
@@ -63,9 +22,68 @@ export class MainPageService {
       responseObject.downVotes = product.downVotes.length;
     }
     return responseObject;
+    return { ...product, author: product.author.toResponseObject(false) };
   }
 
-  async bookmark(id: number, userId: number) {
+  private ensureOwnership(product: MainPageEntity, userId: number) {
+    if (product.author.id !== userId) {
+      throw new HttpException('Incorrect user', HttpStatus.UNAUTHORIZED);
+    }
+  }*/
+
+  async findAll() {
+    //const products = await this.mainPageRepository.find({ relations: ['author'/*'upVotes', 'downVotes'*/] });
+    //return products.map(product => this.toResponseObject(product));
+    return await this.mainPageRepository.find()
+  }
+
+  async create(createMainPageDto: CreateMainPageDto) {
+    /*const user = await this.userRepository.findOne({ where: { id: userId } });
+    const product = await this.mainPageRepository.create({ ...createMainPageDto, author: user });
+    await this.mainPageRepository.save(product);
+    return this.toResponseObject(product);*/
+    const product = await this.mainPageRepository.create(createMainPageDto)
+    await this.mainPageRepository.save(product)
+    return product
+  }
+
+  public async findById(id: number) {
+    const product = await this.mainPageRepository.findOne({ where: { id }});
+    if (!product) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    //return this.toResponseObject(product);
+    return product
+  }
+
+  public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>) {
+    let product = await this.mainPageRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    //this.ensureOwnership(product, userId);
+    //product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author'] });
+    //return this.toResponseObject(product);
+    await this.mainPageRepository.update({ id }, updateMainPageDto)
+    product = await this.mainPageRepository.findOne({ where: { id } });
+    return product
+  }
+
+
+  public async deleteOne(id: number) {
+    const product = await this.mainPageRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    //this.ensureOwnership(product, userId);
+    //await this.mainPageRepository.delete({ id });
+    //return this.toResponseObject(product);
+    await this.mainPageRepository.delete({ id })
+    return product
+  }
+
+
+  /*async bookmark(id: number, userId: number) {
     const product = await this.mainPageRepository.findOne({ where: { id } });
     const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['bookmarks'] });
     if (user.bookmarks.filter(bookmark => bookmark.id === product.id).length < 1) {
@@ -121,6 +139,6 @@ export class MainPageService {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.DOWN);
     return product;
-  }
+  }*/
 
 }

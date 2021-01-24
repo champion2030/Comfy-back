@@ -41,12 +41,12 @@ export class UsersController{
   }
 
 
-  @Get(':id')
+  @Get('getUserByID/:id')
   findOneById(@Param('id') id: number) {
     return  this.userService.findById(id)
   }
 
-  @Get(':email')
+  @Get('getUserByEmail/:email')
   findOneByEmail(@Param('email') email: string) {
     return this.userService.findByEmail(email)
   }

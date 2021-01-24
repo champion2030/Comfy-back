@@ -1,28 +1,25 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/shemes/user.entity';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from '../../users/shemes/user.entity';
 
-@Entity()
-export class MainPage {
-  @ApiProperty()
+@Entity('products')
+export class MainPageEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
   @Column()
   photo: string;
 
-  @ApiProperty()
   @Column()
   bought: boolean;
 
-  @ApiProperty()
   @Column()
   title: string;
 
-  @ApiProperty()
   @Column()
   price: number;
+
+  /*@ManyToOne(type => User, author => author.products)
+  author:User
 
   @ManyToMany(type => User, {cascade: true})
   @JoinTable()
@@ -30,5 +27,5 @@ export class MainPage {
 
   @ManyToMany(type => User, {cascade:true})
   @JoinTable()
-  downVotes: User[]
+  downVotes: User[]*/
 }

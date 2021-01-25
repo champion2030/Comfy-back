@@ -6,7 +6,7 @@ import { MainPageEntity } from './shemes/mainPage.entity';
 import { UserEntity } from '../users/shemes/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MainPageEntity])],
+  imports: [TypeOrmModule.forFeature([MainPageEntity, UserEntity])],
   providers: [MainPageService],
   controllers: [MainPageController],
 })

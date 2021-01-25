@@ -37,10 +37,10 @@ export class UserEntity {
   @Column('text')
   password: string;
 
-  /*@OneToMany(type => MainPage, product => product.author)
-  products: MainPage[]
+  @OneToMany(type => MainPageEntity, product => product.author)
+  products: MainPageEntity[]
 
-  @ManyToMany(type => MainPage, {cascade: true})
+  /*@ManyToMany(type => MainPage, {cascade: true})
   @JoinTable()
   bookmarks: MainPage[]*/
 
@@ -58,6 +58,9 @@ export class UserEntity {
     const responseObject : any = { id, created, firstName, lastName, email, userName };
     if (showToken){
       responseObject.token = token
+    }
+    if (this.products){
+      responseObject.products = this.products
     }
     return responseObject
   }

@@ -18,10 +18,10 @@ export class MainPageEntity {
   @Column()
   price: number;
 
-  /*@ManyToOne(type => User, author => author.products)
-  author:User
+  @ManyToOne(type => UserEntity, author => author.products)
+  author:UserEntity
 
-  @ManyToMany(type => User, {cascade: true})
+  /*@ManyToMany(type => User, {cascade: true})
   @JoinTable()
   upVotes: User[]
 

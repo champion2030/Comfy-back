@@ -11,17 +11,18 @@ import { UserEntity } from '../../users/shemes/user.entity';
 export class MainPageService {
   constructor(
     @InjectRepository(MainPageEntity) private mainPageRepository: Repository<MainPageEntity>,
+    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
   ) {}
 
-  /*private toResponseObject(product: MainPageEntity): mainPageRO {
-    const responseObject: any = { ...product };
+  private toResponseObject(product: MainPageEntity): mainPageRO {
+    /*const responseObject: any = { ...product };
     if (responseObject.upVotes) {
       responseObject.upVotes = product.upVotes.length;
     }
     if (responseObject.downVotes) {
       responseObject.downVotes = product.downVotes.length;
     }
-    return responseObject;
+    return responseObject;*/
     return { ...product, author: product.author.toResponseObject(false) };
   }
 
@@ -29,57 +30,48 @@ export class MainPageService {
     if (product.author.id !== userId) {
       throw new HttpException('Incorrect user', HttpStatus.UNAUTHORIZED);
     }
-  }*/
-
-  async findAll() {
-    //const products = await this.mainPageRepository.find({ relations: ['author'/*'upVotes', 'downVotes'*/] });
-    //return products.map(product => this.toResponseObject(product));
-    return await this.mainPageRepository.find()
   }
 
-  async create(createMainPageDto: CreateMainPageDto) {
-    /*const user = await this.userRepository.findOne({ where: { id: userId } });
-    const product = await this.mainPageRepository.create({ ...createMainPageDto, author: user });
-    await this.mainPageRepository.save(product);
-    return this.toResponseObject(product);*/
-    const product = await this.mainPageRepository.create(createMainPageDto)
+  async findAll(): Promise<mainPageRO[]> {
+    const products = await this.mainPageRepository.find({ relations: ['author'/*'upVotes', 'downVotes'*/] });
+    return products.map(product => this.toResponseObject(product));
+  }
+
+  async create(userId: number, createMainPageDto: CreateMainPageDto): Promise<mainPageRO> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const product = await this.mainPageRepository.create({...createMainPageDto, author: user})
     await this.mainPageRepository.save(product)
-    return product
+    return this.toResponseObject(product)
   }
 
-  public async findById(id: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id }});
+  public async findById(id: number): Promise<mainPageRO> {
+    const product = await this.mainPageRepository.findOne({ where: { id }, relations:['author']});
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    //return this.toResponseObject(product);
-    return product
+    return this.toResponseObject(product)
   }
 
-  public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>) {
-    let product = await this.mainPageRepository.findOne({ where: { id } });
+  public async updateOne(id: number, userId : number, updateMainPageDto: Partial<UpdateMainPageDto>): Promise<mainPageRO> {
+    let product = await this.mainPageRepository.findOne({ where: { id }, relations:['author'] });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    //this.ensureOwnership(product, userId);
-    //product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author'] });
-    //return this.toResponseObject(product);
+    this.ensureOwnership(product, userId);
     await this.mainPageRepository.update({ id }, updateMainPageDto)
-    product = await this.mainPageRepository.findOne({ where: { id } });
-    return product
+    product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author'] });
+    return this.toResponseObject(product);
   }
 
 
-  public async deleteOne(id: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id } });
+  public async deleteOne(id: number, userId: number) {
+    const product = await this.mainPageRepository.findOne({ where: { id }, relations:['author'] });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    //this.ensureOwnership(product, userId);
-    //await this.mainPageRepository.delete({ id });
-    //return this.toResponseObject(product);
+    this.ensureOwnership(product, userId);
     await this.mainPageRepository.delete({ id })
-    return product
+    return this.toResponseObject(product)
   }
 
 

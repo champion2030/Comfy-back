@@ -24,7 +24,7 @@ export class UsersController{
 
   @Get('api/users')
   @UseGuards(new AuthGuard())
-  findAll(@User() user) {
+  findAll() {
     return this.userService.findAll()
   }
 

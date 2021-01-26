@@ -8,5 +8,5 @@ export class UserRO {
   email: string;
   userName: string
   token?: string
-  //bookmarks?: User[]
+  bookmarks?: UserEntity[]
 }

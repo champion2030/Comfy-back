@@ -21,11 +21,11 @@ export class MainPageEntity {
   @ManyToOne(type => UserEntity, author => author.products)
   author:UserEntity
 
-  /*@ManyToMany(type => User, {cascade: true})
+  @ManyToMany(type => UserEntity, {cascade: true})
   @JoinTable()
-  upVotes: User[]
+  upVotes: UserEntity[]
 
-  @ManyToMany(type => User, {cascade:true})
+  @ManyToMany(type => UserEntity, {cascade:true})
   @JoinTable()
-  downVotes: User[]*/
+  downVotes: UserEntity[]
 }

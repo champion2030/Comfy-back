@@ -50,7 +50,7 @@ export class MainPageController {
     return this.mainPageService.deleteOne(id, user)
   }
 
-  /*@Post(':id/bookmark')
+  @Post(':id/bookmark')
   @UseGuards(new AuthGuard())
   bookmarkProduct(@Param('id') id: number, @User('id') user : number){
     return this.mainPageService.bookmark(id, user)
@@ -72,6 +72,6 @@ export class MainPageController {
   @UseGuards(new AuthGuard())
   downVoteProduct(@Param('id') id: number, @User('id') user: number){
     return this.mainPageService.downVote(id, user)
-  }*/
+  }
 
 }

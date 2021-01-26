@@ -7,6 +7,6 @@ export class mainPageRO {
   title: string
   price: number
   author: UserRO
-  //upVotes?: number
-  //downVotes?: number
+  upVotes?: number
+  downVotes?: number
 }

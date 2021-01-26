@@ -40,9 +40,9 @@ export class UserEntity {
   @OneToMany(type => MainPageEntity, product => product.author)
   products: MainPageEntity[]
 
-  /*@ManyToMany(type => MainPage, {cascade: true})
+  @ManyToMany(type => MainPageEntity, {cascade: true})
   @JoinTable()
-  bookmarks: MainPage[]*/
+  bookmarks: MainPageEntity[]
 
   @BeforeInsert()
   async hashPassword() {
@@ -61,6 +61,9 @@ export class UserEntity {
     }
     if (this.products){
       responseObject.products = this.products
+    }
+    if (this.bookmarks){
+      responseObject.bookmark = this.bookmarks
     }
     return responseObject
   }

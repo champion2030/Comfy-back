@@ -1,5 +1,6 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../../users/shemes/user.entity';
+import { CommentsEntity } from '../../comments/shemes/comments.entity';
 
 @Entity('products')
 export class MainPageEntity {
@@ -28,4 +29,7 @@ export class MainPageEntity {
   @ManyToMany(type => UserEntity, {cascade:true})
   @JoinTable()
   downVotes: UserEntity[]
+
+  @OneToMany(type => CommentsEntity, comment => comment.product, {cascade: true})
+  comments: CommentsEntity[]
 }

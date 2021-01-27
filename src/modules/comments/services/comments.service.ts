@@ -12,57 +12,62 @@ export class CommentsService {
     @InjectRepository(CommentsEntity) private commentsRepository: Repository<CommentsEntity>,
     @InjectRepository(MainPageEntity) private mainPageRepository: Repository<MainPageEntity>,
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-  ) {}
+  ) {
+  }
 
-  private toResponseObject(comment: CommentsEntity){
-    const responseObject: any = comment
-    if (comment.author){
-      responseObject.author = comment.author.toResponseObject()
+  private toResponseObject(comment: CommentsEntity) {
+    const responseObject: any = comment;
+    if (comment.author) {
+      responseObject.author = comment.author.toResponseObject();
     }
-    return responseObject
+    return responseObject;
   }
 
-  async showByProduct(id: number){
-    const product = await this.mainPageRepository.findOne({
-      where:{id},
-      relations:['comments', 'comments.author', 'comments.product']
-    })
-    return product.comments.map(comment => this.toResponseObject(comment))
+  async showByProduct(id: number, page: number = 1) {
+    const product = await this.commentsRepository.find({
+      where: { product: { id } },
+      relations: ['author'],
+      take: 15,
+      skip: 15 * (page - 1),
+    });
+    return product.map(comment => this.toResponseObject(comment));
   }
 
-  async showByUser(id: number){
+  async showByUser(id: number, page: number = 1) {
     const comments = await this.commentsRepository.find({
       where: { author: { id } },
-      relations: ['author']
-    })
-    return comments.map(comment => this.toResponseObject(comment))
+      relations: ['author'],
+      take: 15,
+      skip: 15 * (page - 1),
+    });
+    return comments.map(comment => this.toResponseObject(comment));
   }
 
-  async show(id: number){
+  async show(id: number) {
     const comment = await this.commentsRepository.findOne({
       where: { id },
-      relations: ['author', 'product']
-    })
-    return this.toResponseObject(comment)
+      relations: ['author', 'product'],
+    });
+    return this.toResponseObject(comment);
   }
 
-  async create(productId: number, userId: number, data: CreateCommentDto){
-    const product = await this.mainPageRepository.findOne({where:{id: productId}})
-    const user = await this.userRepository.findOne({where:{id:userId}})
-    const comment = await this.commentsRepository.create({ ...data, product, author: user })
-    await this.commentsRepository.save(comment)
-    return this.toResponseObject(comment)
+  async create(productId: number, userId: number, data: CreateCommentDto) {
+    const product = await this.mainPageRepository.findOne({ where: { id: productId } });
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const comment = await this.commentsRepository.create({ ...data, product, author: user });
+    await this.commentsRepository.save(comment);
+    return this.toResponseObject(comment);
   }
 
-  async destroy(id: number, userId: number){
+  async destroy(id: number, userId: number) {
     const comment = await this.commentsRepository.findOne({
-      where:{id},
-      relations:['author', 'product']
-    })
-    if (comment.author.id !== userId){
-      throw new HttpException('You do not own this comment', HttpStatus.UNAUTHORIZED)
+      where: { id },
+      relations: ['author', 'product'],
+    });
+    if (comment.author.id !== userId) {
+      throw new HttpException('You do not own this comment', HttpStatus.UNAUTHORIZED);
     }
-    await this.commentsRepository.remove(comment)
-    return this.toResponseObject(comment)
+    await this.commentsRepository.remove(comment);
+    return this.toResponseObject(comment);
   }
 }

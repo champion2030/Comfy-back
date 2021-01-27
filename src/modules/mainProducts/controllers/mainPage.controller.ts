@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Put, Query,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -21,9 +21,15 @@ export class MainPageController {
   constructor(private mainPageService: MainPageService) {}
 
   @Get()
-  findAll(){
-    return this.mainPageService.findAll()
+  findAll(@Query('page') page: number){
+    return this.mainPageService.findAll(page)
   }
+
+  @Get('/newest')
+  showNewestProducts(@Query('page') page : number){
+    return this.mainPageService.findAll(page)
+  }
+
 
   @Post()
   @UseGuards(new AuthGuard())

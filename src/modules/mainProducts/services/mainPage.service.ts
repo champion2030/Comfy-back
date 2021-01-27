@@ -49,10 +49,14 @@ export class MainPageService {
       throw new HttpException('Unable to cast vote', HttpStatus.BAD_REQUEST);
     }
     return product;
-  }s
+  }
 
-  async findAll(): Promise<mainPageRO[]> {
-    const products = await this.mainPageRepository.find({ relations: ['author', 'upVotes', 'downVotes', 'comments'] });
+  async findAll(page: number = 1): Promise<mainPageRO[]> {
+    const products = await this.mainPageRepository.find({
+      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+      take: 15,
+      skip: 15 * (page - 1),
+    });
     return products.map(product => this.toResponseObject(product));
   }
 
@@ -64,7 +68,10 @@ export class MainPageService {
   }
 
   public async findById(id: number): Promise<mainPageRO> {
-    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'upVotes', 'downVotes', 'comments'] });
+    const product = await this.mainPageRepository.findOne({
+      where: { id },
+      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+    });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
@@ -121,14 +128,20 @@ export class MainPageService {
   }
 
   async upvote(id: number, userId: number) {
-    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author','upVotes', 'downVotes', 'comments'] });
+    let product = await this.mainPageRepository.findOne({
+      where: { id },
+      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+    });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.UP);
     return this.toResponseObject(product);
   }
 
   async downVote(id: number, userId: number) {
-    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'upVotes', 'downVotes', 'comments'] });
+    let product = await this.mainPageRepository.findOne({
+      where: { id },
+      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+    });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.DOWN);
     return this.toResponseObject(product);

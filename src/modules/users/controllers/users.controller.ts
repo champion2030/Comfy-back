@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
-  Put,
+  Put, Query,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -24,8 +24,8 @@ export class UsersController{
 
   @Get('api/users')
   @UseGuards(new AuthGuard())
-  findAll() {
-    return this.userService.findAll()
+  findAll(@Query('page') page : number) {
+    return this.userService.findAll(page)
   }
 
   @Post('login')

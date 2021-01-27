@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { CommentsService } from '../services/comments.service';
 import { AuthGuard } from '../../auth/auth.guard';
 import { ValidationPipe } from '../../mainProducts/exceptions/validation.pipe';
@@ -10,13 +10,13 @@ export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
   @Get('product/:id')
-  showCommentsById(@Param('id') productId: number) {
-    return this.commentsService.showByProduct(productId);
+  showCommentsById(@Param('id') productId: number, @Query('page') page : number) {
+    return this.commentsService.showByProduct(productId, page);
   }
 
   @Get('user/:id')
-  showCommentsByUser(@Param('id') userId: number) {
-    return this.commentsService.showByUser(userId);
+  showCommentsByUser(@Param('id') userId: number, @Query('page') page : number) {
+    return this.commentsService.showByUser(userId, page);
   }
 
   @Post('product/:id')

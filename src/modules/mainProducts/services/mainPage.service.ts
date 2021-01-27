@@ -52,7 +52,7 @@ export class MainPageService {
   }s
 
   async findAll(): Promise<mainPageRO[]> {
-    const products = await this.mainPageRepository.find({ relations: ['author', 'upVotes', 'downVotes'] });
+    const products = await this.mainPageRepository.find({ relations: ['author', 'upVotes', 'downVotes', 'comments'] });
     return products.map(product => this.toResponseObject(product));
   }
 
@@ -64,7 +64,7 @@ export class MainPageService {
   }
 
   public async findById(id: number): Promise<mainPageRO> {
-    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'upVotes', 'downVotes'] });
+    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'upVotes', 'downVotes', 'comments'] });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
@@ -78,13 +78,13 @@ export class MainPageService {
     }
     this.ensureOwnership(product, userId);
     await this.mainPageRepository.update({ id }, updateMainPageDto);
-    product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author'] });
+    product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'comments'] });
     return this.toResponseObject(product);
   }
 
 
   public async deleteOne(id: number, userId: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author'] });
+    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'comments'] });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
@@ -121,14 +121,14 @@ export class MainPageService {
   }
 
   async upvote(id: number, userId: number) {
-    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author','upVotes', 'downVotes'] });
+    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author','upVotes', 'downVotes', 'comments'] });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.UP);
     return this.toResponseObject(product);
   }
 
   async downVote(id: number, userId: number) {
-    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'upVotes', 'downVotes'] });
+    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'upVotes', 'downVotes', 'comments'] });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.DOWN);
     return this.toResponseObject(product);

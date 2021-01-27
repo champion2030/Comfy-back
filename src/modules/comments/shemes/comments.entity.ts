@@ -10,7 +10,7 @@ import {
 import { UserEntity } from '../../users/shemes/user.entity';
 import { MainPageEntity } from '../../mainProducts/shemes/mainPage.entity';
 
-@Entity('comments')
+@Entity('comment')
 export class CommentsEntity {
   @PrimaryGeneratedColumn()
   id: number

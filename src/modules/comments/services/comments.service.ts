@@ -10,41 +10,48 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 export class CommentsService {
   constructor(
     @InjectRepository(CommentsEntity) private commentsRepository: Repository<CommentsEntity>,
-    @InjectRepository(CommentsEntity) private mainPageRepository: Repository<MainPageEntity>,
-    @InjectRepository(CommentsEntity) private userRepository: Repository<UserEntity>,
+    @InjectRepository(MainPageEntity) private mainPageRepository: Repository<MainPageEntity>,
+    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
   ) {}
+
+  private toResponseObject(comment: CommentsEntity){
+    const responseObject: any = comment
+    if (comment.author){
+      responseObject.author = comment.author.toResponseObject()
+    }
+    return responseObject
+  }
 
   async showByProduct(id: number){
     const product = await this.mainPageRepository.findOne({
       where:{id},
       relations:['comments', 'comments.author', 'comments.product']
     })
-    return product.comments
+    return product.comments.map(comment => this.toResponseObject(comment))
   }
 
   async showByUser(id: number){
     const comments = await this.commentsRepository.find({
-      where:{author:{id}},
-      relations:['author']
+      where: { author: { id } },
+      relations: ['author']
     })
-    return comments
+    return comments.map(comment => this.toResponseObject(comment))
   }
 
   async show(id: number){
-    return await this.commentsRepository.findOne({
+    const comment = await this.commentsRepository.findOne({
       where: { id },
       relations: ['author', 'product']
     })
+    return this.toResponseObject(comment)
   }
 
-  async create(productId: number, userId: number, comment: CreateCommentDto){
+  async create(productId: number, userId: number, data: CreateCommentDto){
     const product = await this.mainPageRepository.findOne({where:{id: productId}})
     const user = await this.userRepository.findOne({where:{id:userId}})
-    const data = await this.commentsRepository.create({
-      ...comment, product, author: user
-    })
-    await this.commentsRepository.save(data)
-    return data
+    const comment = await this.commentsRepository.create({ ...data, product, author: user })
+    await this.commentsRepository.save(comment)
+    return this.toResponseObject(comment)
   }
 
   async destroy(id: number, userId: number){
@@ -56,6 +63,6 @@ export class CommentsService {
       throw new HttpException('You do not own this comment', HttpStatus.UNAUTHORIZED)
     }
     await this.commentsRepository.remove(comment)
-    return comment
+    return this.toResponseObject(comment)
   }
 }

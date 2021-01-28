@@ -7,14 +7,15 @@ import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
 import { mainPageRO } from '../shemes/mainPage.ro';
 import { UserEntity } from '../../users/shemes/user.entity';
 import { Votes } from '../../auth/votes.enum';
+import { CommentsEntity } from '../../comments/shemes/comments.entity';
 
 @Injectable()
 export class MainPageService {
   constructor(
     @InjectRepository(MainPageEntity) private mainPageRepository: Repository<MainPageEntity>,
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-  ) {
-  }
+    @InjectRepository(CommentsEntity) private commentsRepository: Repository<CommentsEntity>,
+  ) {}
 
   private toResponseObject(product: MainPageEntity): mainPageRO {
     const responseObject: any = { ...product };
@@ -83,11 +84,13 @@ export class MainPageService {
 
 
   public async deleteOne(id: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['comments'] });
+    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['comments'] });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    await this.mainPageRepository.delete({ id });
+    const comments = await this.commentsRepository.find({ where: { product: { id } }, relations: ['author'] })
+    await this.commentsRepository.remove(comments)
+    await this.mainPageRepository.delete({ id } );
     return this.toResponseObject(product);
   }
 

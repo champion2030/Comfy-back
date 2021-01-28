@@ -14,7 +14,7 @@ export class UsersService{
   ) {}
 
   async findAll(page: number = 1):Promise<UserRO[]> {
-    const users = await this.userRepository.find({relations:['products', 'bookmarks'],
+    const users = await this.userRepository.find({relations:['bookmarks'],
     take: 15,
     skip: 15 * (page-1)
     })

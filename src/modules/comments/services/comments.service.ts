@@ -18,7 +18,7 @@ export class CommentsService {
   private toResponseObject(comment: CommentsEntity) {
     const responseObject: any = comment;
     if (comment.author) {
-      responseObject.author = comment.author.toResponseObject();
+      responseObject.author = comment.author.toResponseObject(false);
     }
     return responseObject;
   }

@@ -37,9 +37,6 @@ export class UserEntity {
   @Column('text')
   password: string;
 
-  @OneToMany(type => MainPageEntity, product => product.author)
-  products: MainPageEntity[]
-
   @ManyToMany(type => MainPageEntity, {cascade: true})
   @JoinTable()
   bookmarks: MainPageEntity[]
@@ -58,9 +55,6 @@ export class UserEntity {
     const responseObject : any = { id, created, firstName, lastName, email, userName };
     if (showToken){
       responseObject.token = token
-    }
-    if (this.products){
-      responseObject.products = this.products
     }
     if (this.bookmarks){
       responseObject.bookmark = this.bookmarks

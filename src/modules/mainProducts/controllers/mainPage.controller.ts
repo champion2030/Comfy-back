@@ -30,12 +30,11 @@ export class MainPageController {
     return this.mainPageService.findAll(page)
   }
 
-
   @Post()
   @UseGuards(new AuthGuard())
   @UsePipes(new ValidationPipe())
-  create(@User('id') user, @Body() createMainPageDto: CreateMainPageDto){
-    return this.mainPageService.create(user, createMainPageDto)
+  create(@Body() createMainPageDto: CreateMainPageDto){
+    return this.mainPageService.create(createMainPageDto)
   }
 
   @Get(':id')
@@ -46,14 +45,14 @@ export class MainPageController {
   @Put(':id')
   @UseGuards(new AuthGuard())
   @UsePipes(new ValidationPipe())
-  updateOne(@Param('id') id: number,@User('id') user, @Body() updateMainPageDto: Partial<UpdateMainPageDto>) {
-    return this.mainPageService.updateOne(id, user, updateMainPageDto)
+  updateOne(@Param('id') id: number, @Body() updateMainPageDto: Partial<UpdateMainPageDto>) {
+    return this.mainPageService.updateOne(id, updateMainPageDto)
   }
 
   @Delete(':id')
   @UseGuards(new AuthGuard())
-  deleteOne(@Param('id') id: number, @User('id') user) {
-    return this.mainPageService.deleteOne(id, user)
+  deleteOne(@Param('id') id: number) {
+    return this.mainPageService.deleteOne(id)
   }
 
   @Post(':id/bookmark')

@@ -17,7 +17,7 @@ export class MainPageService {
   }
 
   private toResponseObject(product: MainPageEntity): mainPageRO {
-    const responseObject: any = { ...product, author: product.author.toResponseObject(false) };
+    const responseObject: any = { ...product };
     if (responseObject.upVotes) {
       responseObject.upVotes = product.upVotes.length;
     }
@@ -25,12 +25,6 @@ export class MainPageService {
       responseObject.downVotes = product.downVotes.length;
     }
     return responseObject;
-  }
-
-  private ensureOwnership(product: MainPageEntity, userId: number) {
-    if (product.author.id !== userId) {
-      throw new HttpException('Incorrect user', HttpStatus.UNAUTHORIZED);
-    }
   }
 
   private async vote(product: MainPageEntity, user: UserEntity, vote: Votes) {
@@ -53,16 +47,15 @@ export class MainPageService {
 
   async findAll(page: number = 1): Promise<mainPageRO[]> {
     const products = await this.mainPageRepository.find({
-      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+      relations: ['upVotes', 'downVotes', 'comments'],
       take: 15,
       skip: 15 * (page - 1),
     });
     return products.map(product => this.toResponseObject(product));
   }
 
-  async create(userId: number, createMainPageDto: CreateMainPageDto): Promise<mainPageRO> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    const product = await this.mainPageRepository.create({ ...createMainPageDto, author: user });
+  async create(createMainPageDto: CreateMainPageDto): Promise<mainPageRO> {
+    const product = await this.mainPageRepository.create({ ...createMainPageDto});
     await this.mainPageRepository.save(product);
     return this.toResponseObject(product);
   }
@@ -70,7 +63,7 @@ export class MainPageService {
   public async findById(id: number): Promise<mainPageRO> {
     const product = await this.mainPageRepository.findOne({
       where: { id },
-      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+      relations: ['upVotes', 'downVotes', 'comments'],
     });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -78,24 +71,22 @@ export class MainPageService {
     return this.toResponseObject(product);
   }
 
-  public async updateOne(id: number, userId: number, updateMainPageDto: Partial<UpdateMainPageDto>): Promise<mainPageRO> {
-    let product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author'] });
+  public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>): Promise<mainPageRO> {
+    let product = await this.mainPageRepository.findOne({ where: { id } });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    this.ensureOwnership(product, userId);
     await this.mainPageRepository.update({ id }, updateMainPageDto);
-    product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'comments'] });
+    product = await this.mainPageRepository.findOne({ where: { id }, relations: ['comments'] });
     return this.toResponseObject(product);
   }
 
 
-  public async deleteOne(id: number, userId: number) {
-    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['author', 'comments'] });
+  public async deleteOne(id: number) {
+    const product = await this.mainPageRepository.findOne({ where: { id }, relations: ['comments'] });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    this.ensureOwnership(product, userId);
     await this.mainPageRepository.delete({ id });
     return this.toResponseObject(product);
   }
@@ -130,7 +121,7 @@ export class MainPageService {
   async upvote(id: number, userId: number) {
     let product = await this.mainPageRepository.findOne({
       where: { id },
-      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+      relations: ['upVotes', 'downVotes', 'comments'],
     });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.UP);
@@ -140,7 +131,7 @@ export class MainPageService {
   async downVote(id: number, userId: number) {
     let product = await this.mainPageRepository.findOne({
       where: { id },
-      relations: ['author', 'upVotes', 'downVotes', 'comments'],
+      relations: ['upVotes', 'downVotes', 'comments'],
     });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     product = await this.vote(product, user, Votes.DOWN);

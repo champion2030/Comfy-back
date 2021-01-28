@@ -19,9 +19,6 @@ export class MainPageEntity {
   @Column()
   price: number;
 
-  @ManyToOne(type => UserEntity, author => author.products)
-  author:UserEntity
-
   @ManyToMany(type => UserEntity, {cascade: true})
   @JoinTable()
   upVotes: UserEntity[]

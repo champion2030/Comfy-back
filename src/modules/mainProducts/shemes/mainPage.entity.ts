@@ -1,6 +1,7 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../../users/shemes/user.entity';
 import { CommentsEntity } from '../../comments/shemes/comments.entity';
+import { ComputersCharacteristicsEntity } from '../../computersCharacteristics/shemes/computersCharacteristics.entity';
 
 @Entity('products')
 export class MainPageEntity {
@@ -29,4 +30,7 @@ export class MainPageEntity {
 
   @OneToMany(type => CommentsEntity, comment => comment.product, {cascade: true})
   comments: CommentsEntity[]
+
+  @OneToMany(type => ComputersCharacteristicsEntity, characteristics => characteristics.product, {cascade: true})
+  characteristics: ComputersCharacteristicsEntity[]
 }

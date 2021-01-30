@@ -48,7 +48,7 @@ export class MainPageService {
 
   async findAll(page: number = 1): Promise<mainPageRO[]> {
     const products = await this.mainPageRepository.find({
-      relations: ['upVotes', 'downVotes', 'comments'],
+      relations: ['upVotes', 'downVotes', 'comments', 'characteristics'],
       take: 15,
       skip: 15 * (page - 1),
     });

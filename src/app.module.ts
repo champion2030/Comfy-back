@@ -8,11 +8,10 @@ import { MainPageModule } from './modules/mainProducts/mainPage.module';
 import { HttpErrorFilter } from './modules/mainProducts/exceptions/http-error.filter';
 import { LoggingInterceptor } from './modules/mainProducts/exceptions/logging.interceptor';
 import { CommentsModule } from './modules/comments/comments.module';
-import { ComputersCharacteristicsModule } from './modules/computersCharacteristics/computersCharacteristics.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UsersModule, MainPageModule, CommentsModule, ComputersCharacteristicsModule],
+  imports: [TypeOrmModule.forRoot(), UsersModule, MainPageModule, CommentsModule],
   controllers: [AppController],
   providers: [
     AppService,

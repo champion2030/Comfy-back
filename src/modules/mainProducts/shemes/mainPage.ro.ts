@@ -1,3 +1,4 @@
+
 export class mainPageRO {
   id: number
   photo: string

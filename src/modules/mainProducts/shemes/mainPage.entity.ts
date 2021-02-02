@@ -1,7 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../../users/shemes/user.entity';
 import { CommentsEntity } from '../../comments/shemes/comments.entity';
-import { ComputersCharacteristicsEntity } from '../../computersCharacteristics/shemes/computersCharacteristics.entity';
 
 @Entity('products')
 export class MainPageEntity {
@@ -20,17 +19,24 @@ export class MainPageEntity {
   @Column()
   price: number;
 
-  @ManyToMany(type => UserEntity, {cascade: true})
+  @Column('simple-json')
+  description: {
+    ScreenDiagonal: string,
+    ProcessorModel: string,
+    AmountOfRAM: string,
+    GraphicsCardModel: string,
+    OperatingSystem: string
+  };
+
+
+  @ManyToMany(type => UserEntity, { cascade: true })
   @JoinTable()
-  upVotes: UserEntity[]
+  upVotes: UserEntity[];
 
-  @ManyToMany(type => UserEntity, {cascade:true})
+  @ManyToMany(type => UserEntity, { cascade: true })
   @JoinTable()
-  downVotes: UserEntity[]
+  downVotes: UserEntity[];
 
-  @OneToMany(type => CommentsEntity, comment => comment.product, {cascade: true})
-  comments: CommentsEntity[]
-
-  @OneToMany(type => ComputersCharacteristicsEntity, characteristics => characteristics.product, {cascade: true})
-  characteristics: ComputersCharacteristicsEntity[]
+  @OneToMany(type => CommentsEntity, comment => comment.product, { cascade: true })
+  comments: CommentsEntity[];
 }

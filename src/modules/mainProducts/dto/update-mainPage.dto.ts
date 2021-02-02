@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsObject, IsString } from 'class-validator';
 
 export class UpdateMainPageDto {
   @IsString()
@@ -9,4 +9,12 @@ export class UpdateMainPageDto {
   title: string
   @IsNumber()
   price: number
+  @IsObject()
+  description: {
+    ScreenDiagonal: string,
+    ProcessorModel: string,
+    AmountOfRAM: string,
+    GraphicsCardModel: string,
+    OperatingSystem: string
+  };
 }

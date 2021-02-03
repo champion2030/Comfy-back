@@ -10,13 +10,13 @@ export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
   @Get('product/:id')
-  showCommentsById(@Param('id') productId: number, @Query('page') page : number) {
-    return this.commentsService.showByProduct(productId, page);
+  showCommentsById(@Param('id') productId: number) {
+    return this.commentsService.showByProduct(productId, );
   }
 
   @Get('user/:id')
-  showCommentsByUser(@Param('id') userId: number, @Query('page') page : number) {
-    return this.commentsService.showByUser(userId, page);
+  showCommentsByUser(@Param('id') userId: number) {
+    return this.commentsService.showByUser(userId, );
   }
 
   @Post('product/:id')

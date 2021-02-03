@@ -8,6 +8,9 @@ import { mainPageRO } from '../shemes/mainPage.ro';
 import { UserEntity } from '../../users/shemes/user.entity';
 import { Votes } from '../../auth/votes.enum';
 import { CommentsEntity } from '../../comments/shemes/comments.entity';
+import { ViewPageRo } from '../shemes/view-page.ro';
+import { AllProductRo } from '../shemes/all-product.ro';
+import { DescriptionProductRo } from '../shemes/description-product.ro';
 
 @Injectable()
 export class MainPageService {
@@ -15,9 +18,21 @@ export class MainPageService {
     @InjectRepository(MainPageEntity) private mainPageRepository: Repository<MainPageEntity>,
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
     @InjectRepository(CommentsEntity) private commentsRepository: Repository<CommentsEntity>,
-  ) {}
+  ) {
+  }
 
   private toResponseObject(product: MainPageEntity): mainPageRO {
+    const responseObject: any = { ...product };
+    if (responseObject.upVotes) {
+      responseObject.upVotes = product.upVotes.length;
+    }
+    if (responseObject.downVotes) {
+      responseObject.downVotes = product.downVotes.length;
+    }
+    return responseObject;
+  }
+
+  private toResponseObjectAllInformation(product: MainPageEntity): AllProductRo {
     const responseObject: any = { ...product };
     if (responseObject.upVotes) {
       responseObject.upVotes = product.upVotes.length;
@@ -56,7 +71,7 @@ export class MainPageService {
   }
 
   async create(createMainPageDto: CreateMainPageDto): Promise<mainPageRO> {
-    const product = await this.mainPageRepository.create({ ...createMainPageDto});
+    const product = await this.mainPageRepository.create({ ...createMainPageDto });
     await this.mainPageRepository.save(product);
     return this.toResponseObject(product);
   }
@@ -71,6 +86,48 @@ export class MainPageService {
     }
     return this.toResponseObject(product);
   }
+
+  public async findForView(id: number): Promise<ViewPageRo> {
+    const product = await this.mainPageRepository.findOne({
+      where: { id },
+    });
+    if (!product) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    return {
+      id: product.id,
+      photo: product.photo,
+      title: product.title,
+      bought: product.bought,
+      price: product.price
+    }
+  }
+
+  public async findForAllProduct(id: number): Promise<AllProductRo> {
+    const product = await this.mainPageRepository.findOne({
+      where: { id },
+      relations: ['upVotes', 'downVotes'],
+    });
+    if (!product) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    return this.toResponseObjectAllInformation(product);
+  }
+
+  public async findProductDescription(id: number): Promise<DescriptionProductRo> {
+    const product = await this.mainPageRepository.findOne({
+      where: { id },
+    });
+    if (!product) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    return {
+      id: product.id,
+      title: product.title,
+      description: product.description
+    }
+  }
+
 
   public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>): Promise<mainPageRO> {
     let product = await this.mainPageRepository.findOne({ where: { id } });
@@ -88,9 +145,9 @@ export class MainPageService {
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    const comments = await this.commentsRepository.find({ where: { product: { id } }, relations: ['author'] })
-    await this.commentsRepository.remove(comments)
-    await this.mainPageRepository.delete({ id } );
+    const comments = await this.commentsRepository.find({ where: { product: { id } }, relations: ['author'] });
+    await this.commentsRepository.remove(comments);
+    await this.mainPageRepository.delete({ id });
     return this.toResponseObject(product);
   }
 

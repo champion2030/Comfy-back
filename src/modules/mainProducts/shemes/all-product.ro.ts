@@ -1,15 +1,9 @@
-import { IsBoolean, IsNumber, IsObject, IsString } from 'class-validator';
-
-export class UpdateMainPageDto {
-  @IsString()
-  photo: string
-  @IsBoolean()
-  bought: boolean
-  @IsString()
-  title: string
-  @IsNumber()
-  price: number
-  @IsObject()
+export class AllProductRo {
+  id: number;
+  photo: string;
+  bought: boolean;
+  title: string;
+  price: number;
   description: {
     ScreenDiagonal: string,
     ProcessorModel: string,
@@ -17,7 +11,6 @@ export class UpdateMainPageDto {
     GraphicsCardModel: string,
     OperatingSystem: string
   };
-  @IsObject()
   viewPhotos: {
     photo1: string,
     photo2: string,
@@ -26,4 +19,6 @@ export class UpdateMainPageDto {
     photo5: string,
     photo6: string
   };
+  upVotes?: number;
+  downVotes?: number;
 }

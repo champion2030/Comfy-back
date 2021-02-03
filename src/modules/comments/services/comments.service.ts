@@ -23,22 +23,18 @@ export class CommentsService {
     return responseObject;
   }
 
-  async showByProduct(id: number, page: number = 1) {
+  async showByProduct(id: number) {
     const product = await this.commentsRepository.find({
       where: { product: { id } },
       relations: ['author'],
-      take: 15,
-      skip: 15 * (page - 1),
     });
     return product.map(comment => this.toResponseObject(comment));
   }
 
-  async showByUser(id: number, page: number = 1) {
+  async showByUser(id: number) {
     const comments = await this.commentsRepository.find({
       where: { author: { id } },
       relations: ['author'],
-      take: 15,
-      skip: 15 * (page - 1),
     });
     return comments.map(comment => this.toResponseObject(comment));
   }

@@ -42,6 +42,21 @@ export class MainPageController {
     return this.mainPageService.findById(id)
   }
 
+  @Get('viewPage/:id')
+  async findForView(@Param('id') id: number) {
+    return this.mainPageService.findForView(id)
+  }
+
+  @Get('allProduct/:id')
+  async findForAllProduct(@Param('id') id: number) {
+    return this.mainPageService.findForAllProduct(id)
+  }
+
+  @Get('descriptionProduct/:id')
+  async findProductDescription(@Param('id') id: number) {
+    return this.mainPageService.findProductDescription(id)
+  }
+
   @Put(':id')
   @UseGuards(new AuthGuard())
   @UsePipes(new ValidationPipe())

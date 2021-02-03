@@ -28,6 +28,15 @@ export class MainPageEntity {
     OperatingSystem: string
   };
 
+  @Column('simple-json')
+  viewPhotos: {
+    photo1: string,
+    photo2: string,
+    photo3: string,
+    photo4: string,
+    photo5: string,
+    photo6: string
+  };
 
   @ManyToMany(type => UserEntity, { cascade: true })
   @JoinTable()

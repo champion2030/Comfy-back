@@ -1,4 +1,4 @@
-export class mainPageRO {
+export class MainPageRO {
   id: number;
   photo: string;
   bought: boolean;

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { MainPageEntity } from '../shemes/mainPage.entity';
 import { CreateMainPageDto } from '../dto/create-mainPage.dto';
 import { UpdateMainPageDto } from '../dto/update-mainPage.dto';
-import { mainPageRO } from '../shemes/mainPage.ro';
+import { MainPageRO } from '../shemes/mainPage.ro';
 import { UserEntity } from '../../users/shemes/user.entity';
 import { Votes } from '../../auth/votes.enum';
 import { CommentsEntity } from '../../comments/shemes/comments.entity';
@@ -21,7 +21,7 @@ export class MainPageService {
   ) {
   }
 
-  private toResponseObject(product: MainPageEntity): mainPageRO {
+  private toResponseObject(product: MainPageEntity): MainPageRO {
     const responseObject: any = { ...product };
     if (responseObject.upVotes) {
       responseObject.upVotes = product.upVotes.length;
@@ -31,6 +31,7 @@ export class MainPageService {
     }
     return responseObject;
   }
+
 
   private toResponseObjectAllInformation(product: MainPageEntity): AllProductRo {
     const responseObject: any = { ...product };
@@ -61,7 +62,7 @@ export class MainPageService {
     return product;
   }
 
-  async findAll(page: number = 1): Promise<mainPageRO[]> {
+  async findAll(page: number = 1): Promise<MainPageRO[]> {
     const products = await this.mainPageRepository.find({
       relations: ['upVotes', 'downVotes', 'comments'],
       take: 15,
@@ -70,13 +71,13 @@ export class MainPageService {
     return products.map(product => this.toResponseObject(product));
   }
 
-  async create(createMainPageDto: CreateMainPageDto): Promise<mainPageRO> {
+  async create(createMainPageDto: CreateMainPageDto): Promise<MainPageRO> {
     const product = await this.mainPageRepository.create({ ...createMainPageDto });
     await this.mainPageRepository.save(product);
     return this.toResponseObject(product);
   }
 
-  public async findById(id: number): Promise<mainPageRO> {
+  public async findById(id: number): Promise<MainPageRO> {
     const product = await this.mainPageRepository.findOne({
       where: { id },
       relations: ['upVotes', 'downVotes', 'comments'],
@@ -129,7 +130,7 @@ export class MainPageService {
   }
 
 
-  public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>): Promise<mainPageRO> {
+  public async updateOne(id: number, updateMainPageDto: Partial<UpdateMainPageDto>): Promise<MainPageRO> {
     let product = await this.mainPageRepository.findOne({ where: { id } });
     if (!product) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);

@@ -76,7 +76,7 @@ export class MainPageController {
     return this.mainPageService.bookmark(id, user)
   }
 
-  @Delete(':id/bookmark')
+  @Delete(':id/unbookmark')
   @UseGuards(new AuthGuard())
   unBookmarkProduct(@Param('id') id: number, @User('id') user : number){
     return this.mainPageService.unBookmark(id, user)

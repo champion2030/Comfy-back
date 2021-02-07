@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate{
   }
 
   async validateToken(auth: string){
-    if (auth.split(' ')[0] !== 'Admin'){
+    if (auth.split(' ')[0] !== 'Bearer'){
       throw new HttpException('Invalid token', HttpStatus.FORBIDDEN)
     }
     const token = auth.split(' ')[1]
